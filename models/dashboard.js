@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
+const { getCurrentDate } = require("../utils");
 
 const DashboardSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to a user (if you implement user authentication later)
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "User",
   },
@@ -11,9 +12,9 @@ const DashboardSchema = new mongoose.Schema({
     default: null,
   },
   date: {
-    type: Number,
+    type: String,
     required: true,
-    default: () => new Date().setHours(0, 0, 0, 0), // Default to start of the day
+    default: getCurrentDate(),
     unique: false,
   },
   tasks: {

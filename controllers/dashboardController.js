@@ -32,9 +32,9 @@ exports.updateDashboard = async (req, res) => {
     const startOfDay = date;
 
     const updatedEntry = await Dashboard.findOneAndUpdate(
-      { userId: req.user.userId, date: startOfDay }, // Find by user and date
-      { tasks, activeTimer }, // Update tasks
-      { new: true, upsert: true } // Create if not found
+      { userId: req.user.userId, date: startOfDay },
+      { tasks, activeTimer },
+      { new: true, upsert: true }
     );
 
     res.status(200).json(updatedEntry);
