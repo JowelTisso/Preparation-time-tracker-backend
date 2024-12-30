@@ -44,18 +44,46 @@ exports.updateDashboard = async (req, res) => {
   }
 };
 
-// Get all dashboard logs for a user
 exports.getAllLogs = async (req, res) => {
   try {
-    const logs = await Dashboard.find({ userId: req.user.userId }).sort({
-      date: -1,
-    });
+    const { page = 1, limit = 10, search = "", startDate, endDate } = req.query;
+
+    const query = { userId: req.user.userId };
+
+    if (search) {
+      query.$or = [{ date: { $regex: search, $options: "i" } }];
+    }
+
+    if (startDate || endDate) {
+      query.date = {};
+      if (startDate) {
+        query.date.$gte = startDate;
+      }
+      if (endDate) {
+        query.date.$lte = endDate;
+      }
+    }
+
+    const logs = await Dashboard.find(query)
+      .sort({ date: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const totalLogs = await Dashboard.countDocuments(query);
 
     if (!logs.length) {
       return res.status(404).json({ message: "No logs found" });
     }
 
-    res.status(200).json(logs);
+    res.status(200).json({
+      logs,
+      pagination: {
+        totalLogs,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalLogs / limit),
+        limit: parseInt(limit),
+      },
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
