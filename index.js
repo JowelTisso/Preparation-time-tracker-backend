@@ -1,6 +1,6 @@
 require("dotenv").config();
+require("./config/db");
 const express = require("express");
-const mongoose = require("./config/db");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
@@ -22,6 +22,9 @@ app.use("/users", userRoutes);
 
 const dashboardRoutes = require("./routes/dashboardRoutes");
 app.use("/dashboard", dashboardRoutes);
+
+const calendarRoutes = require("./routes/calendarRoutes");
+app.use("/calendar", calendarRoutes);
 
 // Start server
 app.listen(PORT, () => {
