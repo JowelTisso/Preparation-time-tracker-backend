@@ -40,7 +40,10 @@ exports.getCalendarData = async (req, res) => {
     });
 
     const formattedData = calendarData.reduce((acc, entry) => {
-      acc[entry.date] = entry.isChecked;
+      acc[entry.date] = {
+        checked: entry.isChecked,
+        note: entry.note,
+      };
       return acc;
     }, {});
 
