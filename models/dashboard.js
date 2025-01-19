@@ -12,7 +12,7 @@ const DashboardSchema = new mongoose.Schema({
     default: null,
   },
   date: {
-    type: String,
+    type: Date,
     required: true,
     default: getCurrentDate(),
     unique: false,

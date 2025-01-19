@@ -6,7 +6,7 @@ exports.getDashboard = async (req, res) => {
   const { date } = req.params;
 
   try {
-    const startOfDay = date;
+    const startOfDay = new Date(date);
 
     const dashboardEntry = await Dashboard.findOne({
       userId: req.user.userId,
@@ -29,7 +29,7 @@ exports.getDashboard = async (req, res) => {
 exports.updateDashboard = async (req, res) => {
   const { activeTimer, date, tasks } = req.body;
   try {
-    const startOfDay = date;
+    const startOfDay = new Date(date);
 
     const updatedEntry = await Dashboard.findOneAndUpdate(
       { userId: req.user.userId, date: startOfDay },
@@ -57,10 +57,10 @@ exports.getAllLogs = async (req, res) => {
     if (startDate || endDate) {
       query.date = {};
       if (startDate) {
-        query.date.$gte = startDate;
+        query.date.$gte = new Date(startDate);
       }
       if (endDate) {
-        query.date.$lte = endDate;
+        query.date.$lte = new Date(endDate);
       }
     }
 
