@@ -17,6 +17,10 @@ const DashboardSchema = new mongoose.Schema({
     default: getCurrentDate(),
     unique: false,
   },
+  formattedDate: {
+    type: String,
+    required: true,
+  },
   tasks: {
     coding: {
       type: Number,

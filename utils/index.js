@@ -1,4 +1,3 @@
 export const getCurrentDate = () => {
-  const date = new Date();
-  return date;
+  return new Date();
 };

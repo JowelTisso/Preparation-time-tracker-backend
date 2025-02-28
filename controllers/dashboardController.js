@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken");
 const Dashboard = require("../models/dashboard");
 
 // Fetch dashboard data for a specific day
@@ -6,8 +5,7 @@ exports.getDashboard = async (req, res) => {
   const { date } = req.params;
 
   try {
-    const startOfDay = new Date(date);
-
+    const startOfDay = new Date(Number(date));
     const dashboardEntry = await Dashboard.findOne({
       userId: req.user.userId,
       date: startOfDay,
@@ -20,7 +18,6 @@ exports.getDashboard = async (req, res) => {
     res.status(200).json(dashboardEntry);
   } catch (error) {
     console.log(error);
-
     res.status(400).json({ error: error.message });
   }
 };
@@ -28,14 +25,36 @@ exports.getDashboard = async (req, res) => {
 // Create or update dashboard data
 exports.updateDashboard = async (req, res) => {
   const { activeTimer, date, tasks } = req.body;
+  const userId = req.user.userId;
+
   try {
     const startOfDay = new Date(date);
 
-    const updatedEntry = await Dashboard.findOneAndUpdate(
-      { userId: req.user.userId, date: startOfDay },
-      { tasks, activeTimer },
-      { new: true, upsert: true }
-    );
+    let dashboardEntry = await Dashboard.findOne({
+      userId: userId,
+      date: startOfDay,
+    });
+
+    if (dashboardEntry) {
+      dashboardEntry.tasks = tasks;
+      dashboardEntry.activeTimer = activeTimer;
+    } else {
+      const formattedDate = new Date(date).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+
+      dashboardEntry = new Dashboard({
+        userId: userId,
+        date: startOfDay,
+        formattedDate: formattedDate,
+        tasks: tasks,
+        activeTimer: activeTimer,
+      });
+    }
+
+    const updatedEntry = await dashboardEntry.save();
 
     res.status(200).json(updatedEntry);
   } catch (error) {
@@ -51,7 +70,7 @@ exports.getAllLogs = async (req, res) => {
     const query = { userId: req.user.userId };
 
     if (search) {
-      query.$or = [{ date: { $regex: search, $options: "i" } }];
+      query.$or = [{ formattedDate: { $regex: search, $options: "i" } }];
     }
 
     if (startDate || endDate) {
